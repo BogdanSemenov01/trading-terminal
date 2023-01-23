@@ -4,31 +4,29 @@ import Decimal from "decimal.js";
 import {ServerEnvelope} from "./Models/ServerMessages";
 
 export default class WSConnector {
+
   connection: WebSocket | undefined;
 
   constructor() {
     this.connection = undefined;
   }
 
-  connect = () => {
-    this.connection = new WebSocket('ws://127.0.0.1:3000/ws/');
+  connect = (callback:any) => {
+    this.connection = new WebSocket("ws://localhost:8080");
     this.connection.onclose = () => {
       this.connection = undefined;
     };
 
     this.connection.onerror = () => {
-
     };
 
     this.connection.onopen = () => {
-
     };
 
     this.connection.onmessage = (event) => {
       const message: ServerEnvelope = JSON.parse(event.data);
       switch (message.messageType) {
         case ServerMessageType.success:
-
           break;
         case ServerMessageType.error:
 
@@ -37,7 +35,7 @@ export default class WSConnector {
 
           break;
         case ServerMessageType.marketDataUpdate:
-
+          callback(message)
           break;
       }
     };
@@ -69,7 +67,7 @@ export default class WSConnector {
     });
   }
 
-  placeOrder = (instrument: Instrument, side: OrderSide, amount: Decimal, price: Decimal) => {
+  placeOrder = (instrument: Instrument, side: OrderSide, amount: number, price: number) => {
     this.send({
       messageType: ClientMessageType.placeOrder,
       message: {
